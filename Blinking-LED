@@ -1,0 +1,29 @@
+.include "m32def.inc"
+
+ldi r16, 0x01 ; all pin at PORTA output
+out DDRA, r16 ; set the PORTA pins
+
+start:
+	ldi r16, 0x01 ; only A0 HIGH
+	out PORTA, r16 ; set A0 HIGH
+
+	call delay
+
+	ldi r16, 0x00
+	out PORTA, r16 ; set A0 LOW
+
+	call delay
+
+    rjmp start
+
+; delay subroutine
+delay: ldi r23, 70
+loop1: ldi r22, 255
+loop2: ldi r21, 255
+loop3: dec r21
+	brne loop3
+	dec r22
+	brne loop2
+	dec r23
+	brne loop1
+	ret
