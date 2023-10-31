@@ -1,0 +1,22 @@
+.include "m32def.inc"
+
+ldi r16, 0x00 ; to set A0 as input pin
+ldi r17, 0xFF ; to set port C as output 
+out DDRA, r16 ; A0 as input
+out DDRC, r17 ; port C as output
+out PORTA, r16 ; set all no internal pull-up resistors
+
+start:
+	in r16, PINA ; read input at port A
+	sbrs r16, 0 ; skip next instruction if bit 0 of port A is cleared
+	rjmp if
+	
+    ldi r17, 0xFC
+	out PORTC, r17
+
+    rjmp start
+
+if:
+	ldi r17, 0x0C
+	out PORTC, r17
+	ret
