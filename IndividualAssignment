@@ -1,0 +1,66 @@
+#include <xc.h>
+#include <avr/io.h>
+#include <util/delay.h>
+
+int main(void)
+{
+	int _sevenseg1[] = {0xfd, 0x61, 0xdb, 0xf3, 0x67, 0xb7};
+	int _sevenseg2and3[] = {0xfc, 0x60, 0xda, 0xf2, 0x66, 0xb6, 0xbe, 0xe0, 0xfe, 0xf6};
+	float voltage;
+	unsigned int _voltage;
+	int _result;
+	int _two_dp_flag;
+	
+	DDRA = 0x00;			// set port A as input
+	DDRB = 0x00;			// set port B as input
+	DDRC = 0xff;			// set port C as output
+	DDRD = 0xff;			// set port D as output
+	
+	ADCSRA |= (1 << ADEN);										// enable the adc				
+	ADCSRA |= ((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0));		// set the prescaler to 128
+	
+	ADMUX |= (1 << REFS0);		// set the adc using avcc
+	
+    while(1)
+    {
+		ADCSRA |= (1 << ADSC);		// start the conversion
+		
+		while((ADCSRA & (1 << ADSC)) == 1);
+		
+		_result = ADCL | (ADCH << 8);
+		voltage = _result * 5.0/1024;
+		_voltage = voltage * 100;
+		
+		_two_dp_flag = PINB;
+		
+		if(_two_dp_flag == 1)
+		{
+			PORTD = 0x01;
+			PORTC = _sevenseg1[_voltage/100];
+			_delay_ms(10);
+			
+			PORTD = 0x00;
+			PORTC = _sevenseg2and3[(_voltage % 100)/10];
+			PORTD = 0x02;
+			_delay_ms(10);
+			
+			PORTD = 0x00;
+			PORTC = _sevenseg2and3[(_voltage % 10)];
+			PORTD = 0x04;
+			_delay_ms(10);
+		}
+		else
+		{
+			PORTD = 0x01;
+			PORTC = _sevenseg1[_voltage/100];
+			_delay_ms(10);
+			
+			PORTD = 0x00;
+			PORTC = _sevenseg2and3[(_voltage % 100)/10];
+			PORTD = 0x02;
+			_delay_ms(10);
+		}
+		
+	}
+	
+}
