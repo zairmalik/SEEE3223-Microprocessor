@@ -1,0 +1,28 @@
+.include "m32def.inc"
+
+.def valuex = r17			; set r17 with name valuex
+.def valuey = r20			; set r20 with name valuey
+
+start:
+	ldi valuex, 5			    ; test case, x = 5
+	mul valuex, valuex		; x^2 operation
+	mov valuey, r0			  ; store multiplication result in y where y = r20
+	lsl valuex				    ; 4*x operation
+	lsl valuex				    ;
+	add valuey, valuex		; x^2 + 4*x
+	ldi valuex, 5			    ; put back value 5 decimal in r16
+	sub valuey, valuex		; x^2 + 4*x - 5
+
+	cpi valuey, 0x60		; compare y with 60 hex
+	brge sendA				  ; if >= hex 60, branch to sendA subroutine, if not continue below
+	ldi r18, 0xff			  ; load all output high to r18
+	out DDRB, r18			  ; set port B as output
+	out PORTB, r18			; send all bit high to port B
+	rjmp start
+
+sendA:
+	ldi r18, 0xff			  ; load all high to r18
+	out DDRA, r18			  ; set port A as output
+	out PORTA, r18			; send all bit high to port A
+
+	
