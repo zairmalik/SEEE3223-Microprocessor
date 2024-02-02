@@ -1,0 +1,27 @@
+.include "m32def.inc"
+
+.def xvalue = r17
+.def yvalue = r20
+
+start:
+	ldi xvalue, 4		; x = 4
+	mul xvalue, xvalue	; x^2
+	mov yvalue, r0		; transfer result to y (y = x^2)
+	lsl xvalue			; 2*x
+	lsl xvalue			; 4*x
+	add yvalue, xvalue	; y = x^2 + 4x
+	ldi r18, 5			; x = 5
+	neg r18				; x = -5
+	add yvalue, r18		; y = x^2 + 4x - 5
+
+	cpi yvalue, 0x60
+	brsh toggleA
+	ldi r19, 0b11111111
+	out DDRB, r19
+	out PORTB, r19
+	rjmp start
+
+toggleA:
+	ldi r19, 0b11111111
+	out DDRA, r19
+	out PORTA, r19
